@@ -10,29 +10,21 @@
 //*****************************************************************************************************
 //***********************************  PROGRAM DESCRIPTION  *******************************************
 //*                                                                                                   *
-//*   PROCESS:  One algebraic expression is read in as a series of characters. Each character of the  *
-//*             expression is then converted to an item and pushed onto a stack for that expression.  *
-//*             each item contains properties such as whether it is an operator or operand, and if it *
-//*             is an operator, the priority of the oprator. The read infix expression is then        *
-//*             converted to its equal postfix expression. Throughout the conversion process, a log   *
-//*             is printed.                                                                           *
-//*             After conversion, the postfix expression is evaluated, and the answer is printed.     *
+//*   PROCESS:  Each of the inventory records are read into an array of records. The records are then *
+//*             sorted using various methods. In between each sort, the list of records is printed.   *
 //*                                                                                                   *
 //*   USER DEFINED                                                                                    *
 //*    MODULES     : Footer - Prints a footer to signify end of program output                        *
 //*                  Header - Prints a header to signify start of program output                      *
 //*                  newPage - Inserts blank lines until the start of a new page                      *
-//*                  invertStack - Inverts the direction of a stack                                   *
-//*                  getLine - Reads in one line with one expression from the input file              *
-//*                  printStack - Prints each of the values in a stack                                *
-//*                  printResults - Prints the original infix expression with the final answer        *
-//*                  printTitleConversion - Prints the conversion section title                       *
-//*                  printTitleEvaluation - Prints the evaluation section title                       *
-//*                  printAllStack - Prints infix and post fix expressions along with opstack         *
-//*                  printPostandOpStack - Prints the post fix expression and the opstack             *
-//*                  convertInfixToPostfix - Converts an infix expression to its corresponding postfix*
-//*                  evaluatePostfix - Evaluates a postfix expression, and returns the answer         *
-//*                  main - Variables are declared, functions are called, and headers are printed     *
+//*                  getData - Gets all of the records from the data file                             *
+//*                  printDataLabels - Prints labels for each of the columns of the data              *
+//*                  printHeaders - Prints a header for each sort type                                *
+//*                  printList - Prints the entire array of elements with correct spacing             *
+//*                  bubbleSort - Sorts the array of records using the bubble sort method             *
+//*                  quickSort - Sorts the array of records using the quick sort method               *
+//*                  shellSort - Sorts the array of records using the shell sort method               *
+//*                  main - Calls each function in order in order to accomplish the desired task      *
 //*                                                                                                   *
 //*****************************************************************************************************
 #include <iostream>
@@ -75,17 +67,16 @@ void Footer(ofstream &Outfile)
 }
 //************************************* END OF FUNCTION FOOTER  ***************************************
 void newPage(ofstream&dataOUT) {
-	// Receives – the output file
-	// Task - Skip to the top of the next page
-	// Returns - Nothing
-	// Insert lines until the end of the page is reached
+		// Receives – the output file
+		// Task - Skip to the top of the next page
+		// Returns - Nothing
+		// Insert lines until the end of the page is reached
 	int MAXPAGELINES = 50;
 	while (lineCount < MAXPAGELINES) {
 		dataOUT << endl;
 		lineCount++;
-	}
-	// Reset line counter to 0
-	lineCount = 0;
+	}		
+	lineCount = 0; // Reset line counter to 0
 }
 //*****************************************************************************************************
 struct recordType {
@@ -96,45 +87,45 @@ struct recordType {
 };
 //*****************************************************************************************************
 int getData(ifstream&dataIN, recordType recordList[]) {
-		// Receives – The input file and the infixExp
-		// Task - Read in a line of data.
-		// Returns - A stack filled with one line of data, and true/false for successful operation
+		// Receives – The input file and the list of records
+		// Task - Read in all data from input file
+		// Returns - An integer signifying the number of records
 		// Declare local variables
 	int iNum = 0, quantity = 0, reoNum = 0, i = 0;
 	char description[26];
 	float cost = 0, price = 0;
-	dataIN >> ws >> iNum; // Read in first inventory number
-	while (iNum > 0){
-
-		dataIN.get(description, 20);
-		//dataIN >> ws >> quantity >> reoNum >> cost >> price;
+	dataIN >> ws >> iNum; //Read in first inventory number
+	while (iNum > 0){ //Keep reading in items until a negative value is reached
+		dataIN.get(description, 20); //Read in 20 characters for description
+			//Read in the quantity, re-order number, cost and price
 		dataIN >> ws >> quantity >> reoNum >> cost >> price;
-
+			//Set each of the values just read to the current array record.
 		recordList[i].iNum = iNum;
 		recordList[i].iDes = string(description);
 		recordList[i].quantity = quantity;
 		recordList[i].reoNum = reoNum;
 		recordList[i].cost = cost;
 		recordList[i].price = price;
-
 		i++; // Increment the inventory count
-		dataIN >> ws >> iNum;
+		dataIN >> ws >> iNum; //Get the next inventory number
 	}
-	return i;
+	return i; //return the number of records read
 }
 //*****************************************************************************************************
 void printList(ofstream&dataOUT, recordType recordList[], int recordCount) {
-	// Receives – The output file and the record list
-	// Task - Print each record 
-	// Returns - Nothing
-	
+			// Receives – The output file, the record list and the record count
+			// Task - Print each record in the list
+			// Returns - Nothing
+		//Keep printing until the end of the list is reached
 	for (int i = 0; i < recordCount; i++) {
-		dataOUT << setw(6) << recordList[i].iNum <<  "      " <<
-			recordList[i].iDes << setw(7) << recordList[i].quantity;
+		dataOUT << setw(6) << recordList[i].iNum << "    "; //Print the inventory number
+			//Print the description and quantity
+		dataOUT << recordList[i].iDes << setw(9) << recordList[i].quantity; 
+			//Print re-order number and cost
 		dataOUT << setw(9) << recordList[i].reoNum << setw(9) << recordList[i].cost
-			<< setw(9) << recordList[i].price;
+			<< setw(9) << recordList[i].price; //Print the selling price
 		dataOUT << endl;
-		lineCount++;
+		lineCount++; //Increment the line counter
 	}
 }
 //*****************************************************************************************************
@@ -142,6 +133,7 @@ void printDataLabels(ofstream&dataOUT) {
 		// Receives – The output file
 		// Task - Print data titles for array elements
 		// Returns - Nothing	
+		//Print data labels
 	dataOUT << "Inventory  Item                 Quantity  Reorder  Cost of  Selling" << endl;
 	dataOUT << " Number    Description          on hand   Number   Item     Price" << endl;
 	dataOUT << "--------   -----------------    --------  -------  -------  -------" << endl;
@@ -149,24 +141,24 @@ void printDataLabels(ofstream&dataOUT) {
 }
 //*****************************************************************************************************
 void printHeaders(ofstream&dataOUT, string sortType) {
-	// Receives – The output file
-	// Task - prints a header for the specific type of sort
-	// Returns - Nothing
-	//If array not sorted yet, print header for original sort
+		// Receives – The output file, and the type of sort for which a label is needed
+		// Task - prints a header for the specific type of sort
+		// Returns - Nothing
+		//If array not sorted yet, print header for original sort
 	if (sortType == "original") {
 		dataOUT << "The Original Inventory Array:" << endl;
 		lineCount++;
-	}	//If sorting by bubble sort, print bubble sort header
+	}	//If sorted by bubble sort, print bubble sort header
 	if (sortType == "bubble") {
 		dataOUT << "The Inventory Array sorted in descending order according to the Quantity on Hand" << endl;
 		dataOUT << "using the Bubble Sort:" << endl;
 		lineCount += 2;
-	}	//If sorting by shell sort, print shell sort header
+	}	//If sorted by shell sort, print shell sort header
 	if (sortType == "shell") {
 		dataOUT << "The Inventory Array sorted in descending order according to the Selling Price" << endl;
 		dataOUT << "using the Shell Sort:" << endl;
 		lineCount += 2;
-	}	//If sorting by quick sort, print quick sort header
+	}	//If sorted by quick sort, print quick sort header
 	if (sortType == "quick") {
 		dataOUT << "The Inventory Array sorted in ascending order according to the Inventory Number" << endl;
 		dataOUT << "using the Quick Sort:" << endl;
@@ -179,16 +171,17 @@ void bubbleSort(recordType recordList[], int recordCount) {
 		// Receives – The list of records and the record count
 		// Task - Sort list in descending order by quantity using bubble sort
 		// Returns - The sorted list
-	bool sorted = false;
+	bool sorted = false; //Initialize bool to track whether list is sorted
 	while (!sorted) { //Keep sorting until the whole list is sorted
 		sorted = true; //Set bool to indicate list is sorted
 		for (int i = 0; i < recordCount-1; i++) { //Go throgh each of the records
-				//If any are found out of place, switch them and set sorted to false
+				//If any are found out of place, switch them and indicate list is not sorted
 			if (recordList[i].quantity < recordList[i + 1].quantity) {
+					//Switch records
 				recordType temp = recordList[i];
 				recordList[i] = recordList[i + 1];
 				recordList[i + 1] = temp;
-				sorted = false; //If any records were moved, set sorted bool to false
+				sorted = false; //Set sorted bool to false
 			}
 		}
 	}
@@ -216,13 +209,11 @@ void shellSort(recordType recordList[], int recordCount) {
 				//Apply bubble sort to the sub array
 			while ((j >= 0) && (!Found))
 			{ //Switch positions of the records if a lower price is found earlier in array
-				if (Temp.price > recordList[j].price) 
-				{
+				if (Temp.price > recordList[j].price) {
 					recordList[j + kVal] = recordList[j];
 					j -= kVal;
 				}
-				else
-				{
+				else{
 					Found = true;
 				}
 			}   // End of while loop
@@ -231,19 +222,52 @@ void shellSort(recordType recordList[], int recordCount) {
 	}
 }
 //*****************************************************************************************************
-void quickSort(recordType recordList[], int recordCount) {
-	int i, j, pValue;
-	i = 0;
-	j = recordCount - 1;
-	pValue = j / 2;
-
+void quickSort(recordType recordList[], int first, int last) {
+		// Receives – The list of records, and the index of the first and last record
+		// Task - Sort the list based on inventory number using the quicksort method
+		// Returns - The sorted list
+	int f, l, mid, midVal; 
+		//Initialize local variables
+	f = first;
+	l = last;
+	mid = (f+l) / 2; 
+	midVal = recordList[mid].iNum;
+		//Keep looping until f reaches l
+	while (f <= l) {
+			//Increment f until the value of the inventory number of that record is no longer less
+			// than the pivot value
+		while (recordList[f].iNum < midVal) {
+			f++;
+		}
+			//Decrement l until the value of the inventory number of that record is not higher than
+			// the pivot value
+		while (recordList[l].iNum > midVal) {
+			l--;
+		}
+			//If f is still less than or equal to l, swap the records, increment f and decrement l
+		if (f <= l) {
+			recordType temp;
+			temp = recordList[f];
+			recordList[f] = recordList[l];
+			recordList[l] = temp;
+			f++;
+			l--;
+		}
+	}
+		//If l is greater than the first value, recursively sort using the current positions
+	if (l > first) {
+		quickSort(recordList, first, l);
+	}
+		//If f is less than the last value, recursively sort using the current positions
+	if (f < last) {
+		quickSort(recordList, f, last);
+	}
 }
 //*****************************************************************************************************
 int main() {
 		// Receives – Nothing
 		// Task - Call each necessary function of the program in order
 		// Returns - Nothing
-		// Declare variables used in program.
 	ifstream dataIN("data_in.txt");  // Open the file containing data.
 	ofstream dataOUT("dataOUT.docx");  // Create and open the file to write data to.	
 	Header(dataOUT); // Print data header.
@@ -262,7 +286,7 @@ int main() {
 	printList(dataOUT, recordList, recordCount); //Print the list after sorting
 	newPage(dataOUT); // Start a new page for the new data
 	printHeaders(dataOUT, "quick"); //Print a header for the quick sort
-	quickSort(recordList, recordCount); //Sort the list by inventory number using quick sort
+	quickSort(recordList, 0, recordCount -1); //Sort the list by inventory number using quick sort
 	printList(dataOUT, recordList, recordCount); //Print the list after sorting
 	Footer(dataOUT); // Print footer. 
 	dataIN.close(); // Close input data file. 
