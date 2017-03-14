@@ -1,11 +1,11 @@
 //************************************  PROGRAM IDENTIFICATION  ***************************************
 //*                                                                                                   *
-//*   PROGRAM FILE NAME:  Project4.cpp          ASSIGNMENT #:  4            Grade: _________          *
+//*   PROGRAM FILE NAME:  Project5.cpp          ASSIGNMENT #:  5            Grade: _________          *
 //*                                                                                                   *
 //*   PROGRAM AUTHOR:     __________________________________________                                  *
 //*                                     Micaiah Skolnick                                              *
 //*                                                                                                   *
-//*   COURSE #:  CSC 36000 11                            DUE DATE:  March 10, 2017                    *
+//*   COURSE #:  CSC 36000 11                            DUE DATE:  March 24, 2017                    *
 //*                                                                                                   *
 //*****************************************************************************************************
 //***********************************  PROGRAM DESCRIPTION  *******************************************
@@ -44,7 +44,7 @@
 #include <sstream>
 using namespace std;
 int lineCount = 0; // Declare and initialize a line counter
-				   //*************************************  FUNCTION HEADER  *********************************************
+//*************************************  FUNCTION HEADER  *********************************************
 void Header(ofstream &Outfile)
 {       // Receives – the output file
 		// Task - Prints the output preamble
@@ -53,7 +53,7 @@ void Header(ofstream &Outfile)
 	Outfile << setw(17) << "CSC 36000";
 	Outfile << setw(15) << "Section 11" << endl;
 	Outfile << setw(27) << "Spring 2017";
-	Outfile << setw(30) << "Assignment #4" << endl;
+	Outfile << setw(30) << "Assignment #5" << endl;
 	Outfile << setw(35) << "---------------------------------- - ";
 	Outfile << setw(35) << "---------------------------------- - " << endl << endl;
 	lineCount += 4; // Increment the line count
@@ -138,9 +138,9 @@ void printList(ofstream&dataOUT, recordType recordList[], int recordCount) {
 	}
 }
 //*****************************************************************************************************
-void printHeaders(ofstream&dataOUT) {
+void printDataLabels(ofstream&dataOUT) {
 		// Receives – The output file
-		// Task - Print data titles for conversion display
+		// Task - Print data titles for array elements
 		// Returns - Nothing	
 	dataOUT << "Inventory  Item                 Quantity  Reorder  Cost of  Selling" << endl;
 	dataOUT << " Number    Description          on hand   Number   Item     Price" << endl;
@@ -148,24 +148,43 @@ void printHeaders(ofstream&dataOUT) {
 	lineCount += 3; // increment the line counter
 }
 //*****************************************************************************************************
-void printTitleEvaluation(ofstream&dataOUT) {
-		// Receives – The output file
-		// Task - Print data titles for evaluation display
-		// Returns - Nothing	
-	dataOUT << setw(50) << "Evaluation DISPLAY" << endl;
-	dataOUT << setw(28) << "POSTFIX Expression" << setw(38) << "Stack Contents";
-	dataOUT << endl << setw(67) << "(Top to Bottom)" << endl;
-	lineCount += 3; // Increment the line counter
+void printHeaders(ofstream&dataOUT, string sortType) {
+	// Receives – The output file
+	// Task - prints a header for the specific type of sort
+	// Returns - Nothing
+	//If array not sorted yet, print header for original sort
+	if (sortType == "original") {
+		dataOUT << "The Original Inventory Array:" << endl;
+		lineCount++;
+	}	//If sorting by bubble sort, print bubble sort header
+	if (sortType == "bubble") {
+		dataOUT << "The Inventory Array sorted in descending order according to the Quantity on Hand" << endl;
+		dataOUT << "using the Bubble Sort:" << endl;
+		lineCount += 2;
+	}	//If sorting by shell sort, print shell sort header
+	if (sortType == "shell") {
+		dataOUT << "The Inventory Array sorted in descending order according to the Selling Price" << endl;
+		dataOUT << "using the Shell Sort:" << endl;
+		lineCount += 2;
+	}	//If sorting by quick sort, print quick sort header
+	if (sortType == "quick") {
+		dataOUT << "The Inventory Array sorted in ascending order according to the Inventory Number" << endl;
+		dataOUT << "using the Quick Sort:" << endl;
+		lineCount += 2;
+	}
+	printDataLabels(dataOUT); // Print data labels beneath the sort type header
 }
 //*****************************************************************************************************
 void bubbleSort(recordType recordList[], int recordCount) {
-	
+		// Receives – The list of records and the record count
+		// Task - Sort list in descending order by quantity using bubble sort
+		// Returns - The sorted list
 	bool sorted = false;
-
-	while (!sorted) {
+	while (!sorted) { //Keep sorting until the whole list is sorted
 		sorted = true; //Set bool to indicate list is sorted
-		for (int i = 0; i < recordCount-1; i++) {
-			if (recordList[i].quantity > recordList[i + 1].quantity) {
+		for (int i = 0; i < recordCount-1; i++) { //Go throgh each of the records
+				//If any are found out of place, switch them and set sorted to false
+			if (recordList[i].quantity < recordList[i + 1].quantity) {
 				recordType temp = recordList[i];
 				recordList[i] = recordList[i + 1];
 				recordList[i + 1] = temp;
@@ -174,36 +193,52 @@ void bubbleSort(recordType recordList[], int recordCount) {
 		}
 	}
 }
+//*****************************************************************************************************
 void shellSort(recordType recordList[], int recordCount) {
-	int NumOfStages = 3;
-	int KValue[] = { 7, 3, 1 };
-	int i=0, j=0, k=0, Stage;
-	recordType Temp;
+		// Receives – The list of records, and the record count
+		// Task - Sort the list based on price using the shell sort method
+		// Returns - The sorted list
+	int NumOfStages = 3; // Initialize the number of stages
+	int KValue[] = { 7, 3, 1 }; // Initialize the k-value for each stage
+	int index = 0, j = 0, kVal = 0, Stage=0; // Initialize the various counters
+	recordType Temp; //Create a variable to store a temporary record
 	bool  Found;
+		//Sort the list one time for each of the stages
 	for (Stage = 1; Stage <= NumOfStages; Stage++)
-	{
-		k = KValue[Stage];
-		for (i = k; i < recordCount; i++)
-		{
-			Temp = recordList[i];
-			j = i-k;
+	{		//Sort based on the k-value of the corresponding stage
+		kVal = KValue[Stage-1];
+			//Search through each of the records
+		for (index = kVal; index < recordCount; index++)
+		{		//Temporarily store the first record in this sub array
+			Temp = recordList[index];
+			j = index - kVal;
 			Found = false;
+				//Apply bubble sort to the sub array
 			while ((j >= 0) && (!Found))
-			{
-				if (Temp.price < recordList[j].price)
+			{ //Switch positions of the records if a lower price is found earlier in array
+				if (Temp.price > recordList[j].price) 
 				{
-					recordList[j + k] = recordList[j];
-					j -= k;
+					recordList[j + kVal] = recordList[j];
+					j -= kVal;
 				}
 				else
 				{
 					Found = true;
 				}
-			}   // end while
-			recordList[j + k] = Temp;
-		}  // end for loop 
+			}   // End of while loop
+			recordList[j + kVal] = Temp;
+		}  // End of for loop 
 	}
 }
+//*****************************************************************************************************
+void quickSort(recordType recordList[], int recordCount) {
+	int i, j, pValue;
+	i = 0;
+	j = recordCount - 1;
+	pValue = j / 2;
+
+}
+//*****************************************************************************************************
 int main() {
 		// Receives – Nothing
 		// Task - Call each necessary function of the program in order
@@ -212,18 +247,23 @@ int main() {
 	ifstream dataIN("data_in.txt");  // Open the file containing data.
 	ofstream dataOUT("dataOUT.docx");  // Create and open the file to write data to.	
 	Header(dataOUT); // Print data header.
-	recordType recordList[50];
+	recordType recordList[50]; //Initialize array to hold records
 	int recordCount = 0;
-	recordCount = getData(dataIN, recordList);
-	printHeaders(dataOUT);
-	printList(dataOUT, recordList, recordCount);
+	recordCount = getData(dataIN, recordList); //Read in all of the data from the input file
+	printHeaders(dataOUT, "original"); //Print header for the original data
+	printList(dataOUT, recordList, recordCount); //Print the list of data	
+	newPage(dataOUT); // Start a new page for the new data
+	printHeaders(dataOUT, "bubble"); //Print a header for the bubble sort
 	bubbleSort(recordList, recordCount); //Sort the list by quantity using bubble sort
-	printHeaders(dataOUT);
 	printList(dataOUT, recordList, recordCount); //Print the list after sorting
+	newPage(dataOUT); // Start a new page for the new data
+	printHeaders(dataOUT,"shell"); //Print a header for the shell sort
 	shellSort(recordList, recordCount); //Sort the list by price using shell sort
-	printHeaders(dataOUT);
 	printList(dataOUT, recordList, recordCount); //Print the list after sorting
-
+	newPage(dataOUT); // Start a new page for the new data
+	printHeaders(dataOUT, "quick"); //Print a header for the quick sort
+	quickSort(recordList, recordCount); //Sort the list by inventory number using quick sort
+	printList(dataOUT, recordList, recordCount); //Print the list after sorting
 	Footer(dataOUT); // Print footer. 
 	dataIN.close(); // Close input data file. 
 	dataOUT.close(); // Close output data file.
