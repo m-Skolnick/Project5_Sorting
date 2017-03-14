@@ -123,12 +123,18 @@ int getData(ifstream&dataIN, recordType recordList[]) {
 	return i;
 }
 //*****************************************************************************************************
-void printList(ofstream&dataOUT, recordType recordList[]) {
+void printList(ofstream&dataOUT, recordType recordList[], int recordCount) {
 	// Receives – The output file and the record list
 	// Task - Print each record 
 	// Returns - Nothing
-	// Declare local variables
-
+	
+	for (int i = 0; i < recordCount; i++) {
+		dataOUT << recordList[i].iNum << recordList[i].iDes << recordList[i].quantity;
+		dataOUT << setw(6) << recordList[i].reoNum << setw(7) << recordList[i].cost
+			<< setw(9) << recordList[i].price;
+		dataOUT << endl;
+		lineCount++;
+	}
 }
 //*****************************************************************************************************
 void printTitleConversion(ofstream&dataOUT) {
@@ -151,6 +157,9 @@ void printTitleEvaluation(ofstream&dataOUT) {
 	lineCount += 3; // Increment the line counter
 }
 //*****************************************************************************************************
+void bubbleSort(recordType recordList[], int recordCount) {
+
+}
 int main() {
 		// Receives – Nothing
 		// Task - Call each necessary function of the program in order
@@ -162,7 +171,8 @@ int main() {
 	recordType recordList[50];
 	int recordCount = 0;
 	recordCount = getData(dataIN, recordList);
-	printList(dataOUT, recordList);
+	printList(dataOUT, recordList, recordCount);
+	bubbleSort(recordList, recordCount);
 
 
 	Footer(dataOUT); // Print footer. 
