@@ -129,21 +129,22 @@ void printList(ofstream&dataOUT, recordType recordList[], int recordCount) {
 	// Returns - Nothing
 	
 	for (int i = 0; i < recordCount; i++) {
-		dataOUT << recordList[i].iNum << recordList[i].iDes << recordList[i].quantity;
-		dataOUT << setw(6) << recordList[i].reoNum << setw(7) << recordList[i].cost
+		dataOUT << setw(6) << recordList[i].iNum <<  "      " <<
+			recordList[i].iDes << setw(7) << recordList[i].quantity;
+		dataOUT << setw(9) << recordList[i].reoNum << setw(9) << recordList[i].cost
 			<< setw(9) << recordList[i].price;
 		dataOUT << endl;
 		lineCount++;
 	}
 }
 //*****************************************************************************************************
-void printTitleConversion(ofstream&dataOUT) {
+void printHeaders(ofstream&dataOUT) {
 		// Receives – The output file
 		// Task - Print data titles for conversion display
 		// Returns - Nothing	
-	dataOUT << setw(50) << "CONVERSION DISPLAY" << endl;
-	dataOUT << "Infix Expression" << setw(28) << "POSTFIX Expression" << setw(28) << "Stack Contents";
-	dataOUT << endl << setw(73) << "(Top to Bottom)" << endl;
+	dataOUT << "Inventory  Item                 Quantity  Reorder  Cost of  Selling" << endl;
+	dataOUT << " Number    Description          on hand   Number   Item     Price" << endl;
+	dataOUT << "--------   -----------------    --------  -------  -------  -------" << endl;
 	lineCount += 3; // increment the line counter
 }
 //*****************************************************************************************************
@@ -158,7 +159,50 @@ void printTitleEvaluation(ofstream&dataOUT) {
 }
 //*****************************************************************************************************
 void bubbleSort(recordType recordList[], int recordCount) {
+	
+	bool sorted = false;
 
+	while (!sorted) {
+		sorted = true; //Set bool to indicate list is sorted
+		for (int i = 0; i < recordCount-1; i++) {
+			if (recordList[i].quantity > recordList[i + 1].quantity) {
+				recordType temp = recordList[i];
+				recordList[i] = recordList[i + 1];
+				recordList[i + 1] = temp;
+				sorted = false; //If any records were moved, set sorted bool to false
+			}
+		}
+	}
+}
+void shellSort(recordType recordList[], int recordCount) {
+	int NumOfStages = 3;
+	int KValue[] = { 7, 3, 1 };
+	int i=0, j=0, k=0, Stage;
+	recordType Temp;
+	bool  Found;
+	for (Stage = 1; Stage <= NumOfStages; Stage++)
+	{
+		k = KValue[Stage];
+		for (i = k; i < recordCount; i++)
+		{
+			Temp = recordList[i];
+			j = i-k;
+			Found = false;
+			while ((j >= 0) && (!Found))
+			{
+				if (Temp.price < recordList[j].price)
+				{
+					recordList[j + k] = recordList[j];
+					j -= k;
+				}
+				else
+				{
+					Found = true;
+				}
+			}   // end while
+			recordList[j + k] = Temp;
+		}  // end for loop 
+	}
 }
 int main() {
 		// Receives – Nothing
@@ -171,9 +215,14 @@ int main() {
 	recordType recordList[50];
 	int recordCount = 0;
 	recordCount = getData(dataIN, recordList);
+	printHeaders(dataOUT);
 	printList(dataOUT, recordList, recordCount);
-	bubbleSort(recordList, recordCount);
-
+	bubbleSort(recordList, recordCount); //Sort the list by quantity using bubble sort
+	printHeaders(dataOUT);
+	printList(dataOUT, recordList, recordCount); //Print the list after sorting
+	shellSort(recordList, recordCount); //Sort the list by price using shell sort
+	printHeaders(dataOUT);
+	printList(dataOUT, recordList, recordCount); //Print the list after sorting
 
 	Footer(dataOUT); // Print footer. 
 	dataIN.close(); // Close input data file. 
