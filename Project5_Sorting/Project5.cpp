@@ -71,7 +71,7 @@ void newPage(ofstream&dataOUT) {
 		// Task - Skip to the top of the next page
 		// Returns - Nothing
 		// Insert lines until the end of the page is reached
-	int MAXPAGELINES = 50;
+	int MAXPAGELINES = 52;
 	while (lineCount < MAXPAGELINES) {
 		dataOUT << endl;
 		lineCount++;
@@ -150,17 +150,20 @@ void printHeaders(ofstream&dataOUT, string sortType) {
 		lineCount++;
 	}	//If sorted by bubble sort, print bubble sort header
 	if (sortType == "bubble") {
-		dataOUT << "The Inventory Array sorted in descending order according to the Quantity on Hand" << endl;
+		dataOUT << "The Inventory Array sorted in descending order according to the Quantity on Hand" 
+			<< endl;
 		dataOUT << "using the Bubble Sort:" << endl;
 		lineCount += 2;
 	}	//If sorted by shell sort, print shell sort header
 	if (sortType == "shell") {
-		dataOUT << "The Inventory Array sorted in descending order according to the Selling Price" << endl;
+		dataOUT << "The Inventory Array sorted in descending order according to the Selling Price" 
+			<< endl;
 		dataOUT << "using the Shell Sort:" << endl;
 		lineCount += 2;
 	}	//If sorted by quick sort, print quick sort header
 	if (sortType == "quick") {
-		dataOUT << "The Inventory Array sorted in ascending order according to the Inventory Number" << endl;
+		dataOUT << "The Inventory Array sorted in ascending order according to the Inventory Number" 
+			<< endl;
 		dataOUT << "using the Quick Sort:" << endl;
 		lineCount += 2;
 	}
