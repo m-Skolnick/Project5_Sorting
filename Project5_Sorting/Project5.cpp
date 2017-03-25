@@ -94,9 +94,9 @@ int getData(ifstream&dataIN, recordType recordList[]) {
 	int iNum = 0, quantity = 0, reoNum = 0, i = 0;
 	char description[26];
 	float cost = 0, price = 0;
-	dataIN >> ws >> iNum; //Read in first inventory number
+	dataIN >> ws >> iNum >> ws; //Read in first inventory number
 	while (iNum > 0){ //Keep reading in items until a negative value is reached
-		dataIN.get(description, 20); //Read in 20 characters for description
+		dataIN.get(description, 25); //Read in 25 characters for description
 			//Read in the quantity, re-order number, cost and price
 		dataIN >> ws >> quantity >> reoNum >> cost >> price;
 			//Set each of the values just read to the current array record.
@@ -107,7 +107,7 @@ int getData(ifstream&dataIN, recordType recordList[]) {
 		recordList[i].cost = cost;
 		recordList[i].price = price;
 		i++; // Increment the inventory count
-		dataIN >> ws >> iNum; //Get the next inventory number
+		dataIN >> ws >> iNum >> ws; //Get the next inventory number
 	}
 	return i; //return the number of records read
 }
@@ -118,12 +118,12 @@ void printList(ofstream&dataOUT, recordType recordList[], int recordCount) {
 			// Returns - Nothing
 		//Keep printing until the end of the list is reached
 	for (int i = 0; i < recordCount; i++) {
-		dataOUT << setw(6) << recordList[i].iNum << "    "; //Print the inventory number
+		dataOUT << setw(6) << recordList[i].iNum << "     "; //Print the inventory number
 			//Print the description and quantity
-		dataOUT << recordList[i].iDes << setw(9) << recordList[i].quantity; 
+		dataOUT << recordList[i].iDes << setw(6) << recordList[i].quantity; 
 			//Print re-order number and cost
-		dataOUT << setw(9) << recordList[i].reoNum << setw(9) << recordList[i].cost
-			<< setw(9) << recordList[i].price; //Print the selling price
+		dataOUT << setw(9) << recordList[i].reoNum << setw(11) << recordList[i].cost
+			<< setw(10) << recordList[i].price; //Print the selling price
 		dataOUT << endl;
 		lineCount++; //Increment the line counter
 	}
@@ -134,9 +134,9 @@ void printDataLabels(ofstream&dataOUT) {
 		// Task - Print data titles for array elements
 		// Returns - Nothing	
 		//Print data labels
-	dataOUT << "Inventory  Item                 Quantity  Reorder  Cost of  Selling" << endl;
-	dataOUT << " Number    Description          on hand   Number   Item     Price" << endl;
-	dataOUT << "--------   -----------------    --------  -------  -------  -------" << endl;
+	dataOUT << "Inventory  Item                     Quantity  Reorder  Cost of  Selling" << endl;
+	dataOUT << " Number    Description              on hand   Number   Item     Price" << endl;
+	dataOUT << "--------   ---------------------    --------  -------  -------  -------" << endl;
 	lineCount += 3; // increment the line counter
 }
 //*****************************************************************************************************
